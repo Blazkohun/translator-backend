@@ -22,7 +22,6 @@ app.post("/translate", async (req, res) => {
 
   try {
     const params = new URLSearchParams();
-    params.append("auth_key", DEEPL_KEY);
     params.append("text", text);
     params.append("source_lang", sourceLang);
     params.append("target_lang", targetLang);
@@ -30,6 +29,7 @@ app.post("/translate", async (req, res) => {
     const response = await fetch(DEEPL_URL, {
       method: "POST",
       headers: {
+        "Authorization": `DeepL-Auth-Key ${DEEPL_KEY}`,
         "Content-Type": "application/x-www-form-urlencoded"
       },
       body: params.toString()
