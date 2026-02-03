@@ -11,33 +11,34 @@ const DEEPL_URL = "https://api-free.deepl.com/v2/translate";
 
 app.post("/translate", async (req, res) => {
   const { text } = req.body;
+
   if (!text) {
     return res.status(400).json({ error: "No text provided" });
   }
 
-  // egyszerű, de stabil nyelvdetektálás
   const isGerman = /\b(und|nicht|ich|das|ist|du|sie|wie|was)\b/i.test(text);
-
-  const targetLang = isGerman ? "HU" : "DE";
   const sourceLang = isGerman ? "DE" : "HU";
+  const targetLang = isGerman ? "HU" : "DE";
 
   try {
-    const params = new URLSearchParams({
-      auth_key: DEEPL_KEY,
-      text: text,
-      source_lang: sourceLang,
-      target_lang: targetLang
-    });
+    const params = new URLSearchParams();
+    params.append("auth_key", DEEPL_KEY);
+    params.append("text", text);
+    params.append("source_lang", sourceLang);
+    params.append("target_lang", targetLang);
 
     const response = await fetch(DEEPL_URL, {
       method: "POST",
-      body: params
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: params.toString()
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("DeepL error:", data);
+      console.error("DeepL API error:", data);
       return res.status(500).json({ error: data });
     }
 
